@@ -23,18 +23,10 @@ jobs:
         run: npm ci
 
       - name: Build app
-        run: npm run build
+        run: npm run build -- --base="/cronor/"
 
       - name: Deploy
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
-          git init
-          git remote add origin https://github.com/${{ github.repository }}
-          git fetch origin gh-pages || echo "gh-pages branch does not exist yet"
-          git checkout -B gh-pages
-          rm -rf *
-          cp -r build/* .
-          git add .
-          git commit -m "Deploy to GitHub Pages"
-          git push --force origin gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.AUTH_GITHUB_TOKEN }}
+          publish_dir: ./dist
