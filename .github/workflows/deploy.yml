@@ -29,12 +29,11 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@users.noreply.github.com"
-          git init
-          git remote add origin https://github.com/${{ github.repository }}
           git fetch origin gh-pages || echo "gh-pages branch does not exist yet"
-          git checkout -B gh-pages
-          rm -rf *
+          git switch gh-pages || git switch --create gh-pages
+          find . -mindepth 1 -maxdepth 1 ! -name 'build' ! -name '.git' -exec rm -rf {} +
           cp -r build/* .
+          rm -rf build
           git add .
           git commit -m "Deploy to GitHub Pages"
           git push --force origin gh-pages
