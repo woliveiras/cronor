@@ -1,0 +1,40 @@
+name: Deploy
+description: Deploy app in gh-pages branch.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: npm run build
+
+      - name: Deploy
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+          git init
+          git remote add origin https://github.com/${{ github.repository }}
+          git fetch origin gh-pages || echo "gh-pages branch does not exist yet"
+          git checkout -B gh-pages
+          rm -rf *
+          cp -r build/* .
+          git add .
+          git commit -m "Deploy to GitHub Pages"
+          git push --force origin gh-pages
